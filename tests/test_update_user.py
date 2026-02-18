@@ -1,7 +1,8 @@
 import allure
 import pytest
-from data.test_data import UserMessages, UserData
+from data.test_data import UserMessages
 from helpers.user_helper import update_user
+from helpers.user_generator import UserGenerator
 
 
 class TestUpdateUser:
@@ -12,17 +13,17 @@ class TestUpdateUser:
         access_token = created_user["access_token"]
         # Шаг 2: Подготовка уникальных данных для обновления
         update_data = {
-            "email": UserData.generate_unique_email(),
-            "name": UserData.generate_unique_name()
+            "email": UserGenerator.generate_unique_email(),
+            "name": UserGenerator.generate_unique_name()
         }
         # Шаг 3: Обновление данных пользователя
         response = update_user(access_token, update_data)
         response_body = response.json()
-        # Шаг 4: Проверка успешного обновления
-        assert (response.status_code == 200 and 
-                response_body["success"] is True and 
-                response_body["user"]["email"] == update_data["email"] and
-                response_body["user"]["name"] == update_data["name"])
+        # Шаг 4: Проверки
+        assert response.status_code == 200
+        assert response_body["success"] is True
+        assert response_body["user"]["email"] == update_data["email"]
+        assert response_body["user"]["name"] == update_data["name"]
 
     @allure.title("Изменение только email пользователя с авторизацией")
     @allure.description("Проверка успешного обновления email пользователя")
@@ -30,14 +31,14 @@ class TestUpdateUser:
         # Шаг 1: Получение токена авторизации
         access_token = created_user["access_token"]
         # Шаг 2: Подготовка уникального email для обновления
-        update_data = {"email": UserData.generate_unique_email()}
+        update_data = {"email": UserGenerator.generate_unique_email()}
         # Шаг 3: Обновление email пользователя
         response = update_user(access_token, update_data)
         response_body = response.json()
-        # Шаг 4: Проверка успешного обновления
-        assert (response.status_code == 200 and 
-                response_body["success"] is True and 
-                response_body["user"]["email"] == update_data["email"])
+        # Шаг 4: Проверки
+        assert response.status_code == 200
+        assert response_body["success"] is True
+        assert response_body["user"]["email"] == update_data["email"]
 
     @allure.title("Изменение только имени пользователя с авторизацией")
     @allure.description("Проверка успешного обновления имени пользователя")
@@ -45,14 +46,14 @@ class TestUpdateUser:
         # Шаг 1: Получение токена авторизации
         access_token = created_user["access_token"]
         # Шаг 2: Подготовка уникального имени для обновления
-        update_data = {"name": UserData.generate_unique_name()}
+        update_data = {"name": UserGenerator.generate_unique_name()}
         # Шаг 3: Обновление имени пользователя
         response = update_user(access_token, update_data)
         response_body = response.json()
-        # Шаг 4: Проверка успешного обновления
-        assert (response.status_code == 200 and 
-                response_body["success"] is True and 
-                response_body["user"]["name"] == update_data["name"])
+        # Шаг 4: Проверки
+        assert response.status_code == 200
+        assert response_body["success"] is True
+        assert response_body["user"]["name"] == update_data["name"]
 
     @allure.title("Изменение данных пользователя без авторизации")
     @allure.description("Проверка ошибки при попытке обновления данных без токена авторизации")
@@ -62,7 +63,7 @@ class TestUpdateUser:
         # Шаг 2: Попытка обновления данных без авторизации
         response = update_user(None, update_data)
         response_body = response.json()
-        # Шаг 3: Проверка ошибки
-        assert (response.status_code == 401 and 
-                response_body["success"] is False and 
-                response_body["message"] == UserMessages.UNAUTHORIZED)
+        # Шаг 3: Проверки
+        assert response.status_code == 401
+        assert response_body["success"] is False
+        assert response_body["message"] == UserMessages.UNAUTHORIZED

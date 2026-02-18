@@ -13,12 +13,12 @@ class TestCreateOrder:
         # Шаг 2: Создание заказа с валидными ингредиентами
         response = create_order(access_token, Ingredients.VALID_INGREDIENTS_REQUEST)
         response_body = response.json()
-        # Шаг 3: Проверка успешного создания заказа
-        assert (response.status_code == 200 and 
-                response_body["success"] is True and 
-                "name" in response_body and
-                "order" in response_body and
-                "number" in response_body["order"])
+        # Шаг 3: Проверки
+        assert response.status_code == 200
+        assert response_body["success"] is True
+        assert "name" in response_body
+        assert "order" in response_body
+        assert "number" in response_body["order"]
 
     @allure.title("Создание заказа без авторизации, но с ингредиентами")
     @allure.description("Проверка создания заказа неавторизованным пользователем")
@@ -26,12 +26,12 @@ class TestCreateOrder:
         # Шаг 1: Создание заказа без авторизации
         response = create_order(None, Ingredients.VALID_INGREDIENTS_REQUEST)
         response_body = response.json()
-        # Шаг 2: Проверка успешного создания заказа
-        assert (response.status_code == 200 and 
-                response_body["success"] is True and 
-                "name" in response_body and
-                "order" in response_body and
-                "number" in response_body["order"])
+        # Шаг 2: Проверки
+        assert response.status_code == 200
+        assert response_body["success"] is True
+        assert "name" in response_body
+        assert "order" in response_body
+        assert "number" in response_body["order"]
 
     @allure.title("Создание заказа без ингредиентов")
     @allure.description("Проверка ошибки при попытке создать заказ без ингредиентов")
@@ -41,10 +41,10 @@ class TestCreateOrder:
         # Шаг 2: Попытка создания заказа без ингредиентов
         response = create_order(access_token, Ingredients.EMPTY_INGREDIENTS_REQUEST)
         response_body = response.json()
-        # Шаг 3: Проверка ошибки
-        assert (response.status_code == 400 and 
-                response_body["success"] is False and 
-                response_body["message"] == UserMessages.INGREDIENTS_REQUIRED)
+        # Шаг 3: Проверки
+        assert response.status_code == 400
+        assert response_body["success"] is False
+        assert response_body["message"] == UserMessages.INGREDIENTS_REQUIRED
 
     @allure.title("Создание заказа с неверным хешем ингредиентов")
     @allure.description("Проверка ошибки сервера при передаче невалидного хеша")
@@ -53,5 +53,5 @@ class TestCreateOrder:
         access_token = created_user["access_token"]
         # Шаг 2: Попытка создания заказа с невалидным хешем
         response = create_order(access_token, Ingredients.INVALID_INGREDIENTS_REQUEST)
-        # Шаг 3: Проверка ошибки сервера (500 возвращает только статус, без тела)
+        # Шаг 3: Проверка (500 возвращает только статус, без тела)
         assert response.status_code == 500
